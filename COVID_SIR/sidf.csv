@@ -1,0 +1,9 @@
+,FIPS,Admin2,Province_State,Country_Region,Last_Update,Lat,Long_,Confirmed,Deaths,Recovered,Active,Combined_Key,Incident_Rate,Case_Fatality_Ratio,Date
+8,,,Australian Capital Territory,Australia,2022-01-01 04:22:14,-35.4735,149.0124,4010,15,,,"Australian Capital Territory, Australia",1039.0095772015884,0.3740648379052369,2022-01-01 04:22:14
+9,,,New South Wales,Australia,2022-01-01 04:22:14,-33.8688,151.2093,187504,663,,,"New South Wales, Australia",2587.8418329637843,0.3535924566942572,2022-01-01 04:22:14
+10,,,Northern Territory,Australia,2022-01-01 04:22:14,-12.4634,130.8456,572,1,,,"Northern Territory, Australia",263.0293159609121,0.1748251748251748,2022-01-01 04:22:14
+11,,,Queensland,Australia,2022-01-01 04:22:14,-27.4698,153.0251,13863,7,,,"Queensland, Australia",315.21845371908904,0.0504941210416215,2022-01-01 04:22:14
+12,,,South Australia,Australia,2022-01-01 04:22:14,-34.9285,138.6007,11078,6,,,"South Australia, Australia",750.2419584400798,0.0541614009749052,2022-01-01 04:22:14
+13,,,Tasmania,Australia,2022-01-01 04:22:14,-42.8821,147.3272,785,13,,,"Tasmania, Australia",225.7703081232493,1.6560509554140128,2022-01-01 04:22:14
+14,,,Victoria,Australia,2022-01-01 04:22:14,-37.8136,144.9631,183976,1534,,,"Victoria, Australia",2774.9438151405,0.8338044092707745,2022-01-01 04:22:14
+15,,,Western Australia,Australia,2022-01-01 04:22:14,-31.9505,115.8605,1161,9,,,"Western Australia, Australia",44.134418003497295,0.7751937984496124,2022-01-01 04:22:14
