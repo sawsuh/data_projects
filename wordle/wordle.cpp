@@ -76,26 +76,7 @@ class Game {
     bool self_play;
     Guess recommendation;
     bool finished;
-  void create_aspace() {
-    string line;
-    ifstream file("answer_poss.txt");
-    while(getline(file, line)) {
-      answer_spce.insert(line);
-    }
-  }
-  void create_wspace() {
-    string line;
-    ifstream file("allowed.txt");
-    while(getline(file, line)) {
-      word_spce.insert(line);
-    }
-    for (auto i: answer_spce) {
-      if (word_spce.find(i) == word_spce.end()) {
-        word_spce.insert(i);
-      }
-    }
-  }
-  void initialise(bool s) {
+  Game(bool s) {
     finished = false;
 
     guessnum = 0;
@@ -103,7 +84,24 @@ class Game {
     self_play = s;
 
     // initialise answer space
-    this->create_aspace();
+    string line;
+    ifstream file("answer_poss.txt");
+    while(getline(file, line)) {
+      answer_spce.insert(line);
+    }
+    file.close();
+
+    // initialise word space
+    file.open("allowed.txt");
+    while(getline(file, line)) {
+      word_spce.insert(line);
+    }
+    file.close();
+    for (auto i: answer_spce) {
+      if (word_spce.find(i) == word_spce.end()) {
+        word_spce.insert(i);
+      }
+    }
 
     if (self_play) {
       srand(time(NULL));
@@ -112,10 +110,6 @@ class Game {
       advance(it, r);
       answer = *it;
     }
-
-    // initialise word space
-    this->create_wspace();
-
 
     // initialise possibilities
     set<string> tp;
@@ -132,6 +126,9 @@ class Game {
       tp = output;
     }
     total_possibilities = tp;
+  }
+  void set_answer(string a) {
+    answer = a;
   }
   void restrict_aspce() {
     int old_len = answer_spce.size();
@@ -167,10 +164,11 @@ class Game {
       recommendation.guess = *(answer_spce.begin());
       return;
     }
-    float curr_H = 100;
-    //float curr_H = -1;
+    //float curr_H = 100;
+    float curr_H = -1;
     Guess curr_guess;
     curr_guess.guess = "ERROR";
+    float curr_p = 0;
     for (auto i : word_spce) {
       Guess possible_guess;
       possible_guess.guess = i;
@@ -205,14 +203,15 @@ class Game {
       if (answer_spce.find(possible_guess.guess) != answer_spce.end()) {
         p_correct = 1/answer_size;
       }
-      double H = (1 - p_correct) * ((E>0)?(log2(answer_size)/E):100);
-      //double H = E;
-      if (H < curr_H) {
+      //double H = (1 - p_correct) * ((E>0)?(log2(answer_size)/E):100);
+      double H = E;
+      if ((H > curr_H) || ((H == curr_H) && (p_correct > curr_p))){
+        curr_p = p_correct;
         curr_H = H;
         curr_guess = possible_guess;
         cout << "current guess: " <<
-          possible_guess.guess << " with E=" <<
-          E << ", p=" << p_correct <<
+          curr_guess.guess << " with E=" <<
+          E << ", p=" << curr_p <<
           ", H=" << H << endl;
       }
     }
@@ -250,9 +249,11 @@ class Game {
 int main() {
   int sum = 0;
   int count = 0;
-  for(int i=0; i<300; i++) {
-    Game g;
-    g.initialise(true);
+  Game blank(false);
+  //for(int i=0; i<300; i++) {
+  for(auto i: blank.answer_spce) {
+    Game g(true);
+    g.set_answer(i);
     g.play();
     count++;
     sum += g.guessnum;
