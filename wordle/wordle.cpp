@@ -229,7 +229,16 @@ class Game {
     Guess initial;
     initial.guess = "soare";
     this->make_guess(initial);
+    bool init = true;
+    int old_asp_size, new_asp_size;
     for (int i=0; i<5; i++) {
+      if (init) {
+        init = false;
+      } else {
+        outfile << guessnum << ", " << recent_entropy <<
+          ", " << old_asp_size << ", " << new_asp_size <<
+          ", " << recent_p << ", " << answer << endl;
+      }
       if ((!self_play) && (answer_spce.size() <= 1)) {
         cout << *(answer_spce.begin()) << endl;
       }
@@ -241,15 +250,15 @@ class Game {
       Guess next;
       if (self_play) {
         next = recommendation;
-        outfile << guessnum+1 << ", " << recent_entropy <<
-          ", " << answer_spce.size() << ", " << recent_p << endl;
       } else {
         cin >> next.guess;
         if (next.guess.size()<5) {
           next = recommendation;
         }
       }
+      old_asp_size = answer_spce.size();
       this->make_guess(next);
+      new_asp_size = answer_spce.size();
     }
   }
 };
