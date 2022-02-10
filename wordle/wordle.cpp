@@ -127,9 +127,6 @@ class Game {
     }
     total_possibilities = tp;
   }
-  void set_answer(string a) {
-    answer = a;
-  }
   void restrict_aspce() {
     int old_len = answer_spce.size();
     set<string> new_spce;
@@ -253,7 +250,7 @@ int main() {
   //for(int i=0; i<300; i++) {
   for(auto i: blank.answer_spce) {
     Game g(true);
-    g.set_answer(i);
+    g.answer = i;
     g.play();
     count++;
     sum += g.guessnum;
