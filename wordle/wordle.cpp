@@ -76,7 +76,14 @@ class Game {
     bool self_play;
     Guess recommendation;
     bool finished;
+    ofstream outfile;
+    float recent_entropy;
+    float recent_p;
   Game(bool s) {
+
+    // initialise logging
+    outfile.open("log.csv", ios_base::app);
+
     finished = false;
 
     guessnum = 0;
@@ -212,6 +219,8 @@ class Game {
           ", H=" << H << endl;
       }
     }
+    recent_entropy = curr_H;
+    recent_p = curr_p;
     cout << "\n guess:" << curr_guess.guess << endl;
     //return curr_guess.guess;
     recommendation = curr_guess;
@@ -232,6 +241,8 @@ class Game {
       Guess next;
       if (self_play) {
         next = recommendation;
+        outfile << guessnum+1 << ", " << recent_entropy <<
+          ", " << answer_spce.size() << ", " << recent_p << endl;
       } else {
         cin >> next.guess;
         if (next.guess.size()<5) {
