@@ -69,16 +69,12 @@ class Game {
   public:
     int guessnum;
     vector<Guess> guesses;
-    set<string> answer_spce;
-    set<string> word_spce;
-    set<string> total_possibilities;
+    set<string> answer_spce, word_spce, total_possibilities;
     string answer;
-    bool self_play;
+    bool self_play, finished;
     Guess recommendation;
-    bool finished;
     ofstream outfile;
-    float recent_entropy;
-    float recent_p;
+    float recent_entropy, recent_p;
   Game(bool s) {
 
     // initialise logging
