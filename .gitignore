@@ -5,3 +5,4 @@ COVID_SIR/data/owid-covid-data.csv
 COVID_SIR/data/*
 wordle/wordle
 wordle/.ccls-cache*
+wordle/.ccls-cache/*
