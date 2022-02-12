@@ -1,4 +1,3 @@
-wordle/log.csv
 melb_airbnb_covid/*.csv
 melb_airbnb_covid/*/*.csv
 COVID_SIR/data/owid-covid-data.csv
