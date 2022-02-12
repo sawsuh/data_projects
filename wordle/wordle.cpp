@@ -205,7 +205,7 @@ class Game {
       }
       //double H = (1 - p_correct) * ((E>0)?(log2(answer_size)/E):100);
       double H = E;
-      if ((H < curr_H) || ((H == curr_H) && (p_correct > curr_p))){
+      if ((H > curr_H) || ((H == curr_H) && (p_correct > curr_p))){
       //if (H < curr_H) {
         curr_p = p_correct;
         curr_H = H;
@@ -232,7 +232,8 @@ class Game {
       if (init) {
         init = false;
       } else if (self_play) {
-        outfile << guessnum << ", " << recent_entropy <<
+        outfile << guessnum << ", " << 
+          guesses.back().guess << ", " << recent_entropy <<
           ", " << old_asp_size << ", " << new_asp_size <<
           ", " << recent_p << ", " << answer << endl;
       }
@@ -268,12 +269,12 @@ int main() {
   bool starting = true;
   for(auto i: blank.answer_spce) {
     if (starting) {
-      if (i == "mince") {
+      if (i == "actor") {
         starting = false;
       }
       continue;
     }
-    Game g("false");
+    Game g("true");
     g.answer = i;
     g.play();
     count++;
