@@ -165,7 +165,7 @@ class Game {
       return;
     }
     //double curr_H = 100;
-    double curr_H = -1;
+    double curr_H = 1000;
     Guess curr_guess;
     curr_guess.guess = "ERROR";
     double curr_p = 0;
@@ -204,8 +204,12 @@ class Game {
         p_correct = 1/answer_size;
       }
       //double H = (1 - p_correct) * ((E>0)?(log2(answer_size)/E):100);
-      double H = E;
-      if ((H > curr_H) || ((H == curr_H) && (p_correct > curr_p))){
+      //double H = E;
+
+      // Compute expected number of future turns using model
+      double H = 1.0832 - 0.1352*(this->guessnum+1) + 0.3895 * log2(this->answer_spce.size()) - 0.5815 * p_correct -0.1797 * E;
+
+      if ((H < curr_H) || ((H == curr_H) && (p_correct > curr_p))){
       //if (H < curr_H) {
         curr_p = p_correct;
         curr_H = H;
@@ -232,7 +236,7 @@ class Game {
       if (init) {
         init = false;
       } else if (self_play) {
-        outfile << guessnum << ", " << 
+        outfile << guessnum << ", " <<
           guesses.back().guess << ", " << recent_entropy <<
           ", " << old_asp_size << ", " << new_asp_size <<
           ", " << recent_p << ", " << answer << endl;
@@ -269,7 +273,7 @@ int main() {
   bool starting = true;
   for(auto i: blank.answer_spce) {
     if (starting) {
-      if (i == "actor") {
+      if (i == "donor") {
         starting = false;
       }
       continue;
