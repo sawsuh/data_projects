@@ -7,3 +7,5 @@ wordle/.ccls-cache*
 wordle/.ccls-cache/*
 wordle/.ipynb_checkpoints/*
 afl_model/**/*.RData
+afl_model/**/*.pdf
+**/.Rhistory

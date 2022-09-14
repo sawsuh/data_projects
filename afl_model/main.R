@@ -5,7 +5,7 @@ library(parallel)
 
 year_filter <- T
 year_to_use <- 2012:2021
-model_saved <- T
+model_saved <- F
 model_path <- "model_v2.RData"
 
 source("code/load_data.R")

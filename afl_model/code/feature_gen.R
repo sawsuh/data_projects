@@ -27,16 +27,15 @@ get_player_matrix <- function(player_mean_df, cols) {
     scale
 }
 
-#get_stan_input <- function(player_mean_matrix, home_df, away_df, game_df, row_membership_col='player_idx',
-get_stan_input <- function(player_mean_matrix, home_stats, away_stats, game_df, row_membership_col='player_idx',
+get_stan_input <- function(player_mean_matrix, home_df, away_df, game_df, row_membership_col='player_idx',
                            homescore="homeTeamScore", awayscore="awayTeamScore") {
   list(
     K = ncol(player_mean_matrix),
-    #N_players = nrow(player_mean_matrix),
+    N_players = nrow(player_mean_matrix),
     N_games = nrow(game_df),
-    #player_data = player_mean_matrix,
-    home = home_stats,
-    away = away_stats,
+    player_data = player_mean_matrix,
+    home = home_df,
+    away = away_df,
     deficit = game_df[[homescore]] - game_df[[awayscore]]
   )
 }
