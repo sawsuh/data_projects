@@ -3,9 +3,9 @@ library(tidyverse)
 library(rstan)
 library(parallel)
 
-year_filter <- F
-year_to_use <- 2012
-model_saved <- F
+year_filter <- T
+year_to_use <- 2012:2021
+model_saved <- T
 model_path <- "model_v2.RData"
 
 source("code/load_data.R")
