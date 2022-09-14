@@ -1,6 +1,6 @@
 ---
 title: "Results Analysis"
-output: html_document
+output: rmarkdown::github_document
 ---
 
 ```{r setup, include=FALSE}
@@ -50,7 +50,7 @@ ggplot(data.frame(Residual=stan_input$deficit-predicted_deficits), aes(x=Residua
   ggtitle("Residual Density Plot")
 ```
 
-We can now try and apply this to predict wins.
+We can now try and apply this to compute win prediction accuracy.
 ```{r}
 game_wins <- as.numeric(stan_input$deficit>0)
 predicted_wins <- as.numeric(predicted_deficits>0)
