@@ -4,9 +4,13 @@ library(rstan)
 library(parallel)
 
 source("code/load_data.R")
-games <- get_file("data/games.csv", "game")
+
+year_filter <-T
+year_to_use <- 2012
+
+games <- get_file("data/games.csv", "game", filter_years=year_filter, years=year_to_use)
 players <- get_file("data/players.csv", "player")
-stats <- get_file("data/stats.csv", "row")
+stats <- get_file("data/stats.csv", "row", filter_years=year_filter, years=year_to_use)
 
 length(which(duplicated(stats[, c("gameId", "playerId")])))
 

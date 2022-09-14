@@ -1,7 +1,10 @@
 ### Data building functions
 
-get_file <- function(filepath, name) {
+get_file <- function(filepath, name, filter_years=F, years=2012:2021, yearcol='year') {
   dat <- read.csv(filepath)
+  if (filter_years) {
+    dat <- dat[dat[[yearcol]] %in% years, ]
+  }
   dat[, paste0(name,'_idx')] <- seq_len(nrow(dat))
   return(dat)
 }
