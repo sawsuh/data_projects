@@ -1,0 +1,5 @@
+because this was only trained on 1 season, the model effectively tries to predict team ELOs, where higher ELO teams perform better.
+So, ELO averaged by team just tries to predict team performance.
+Thus, players with high ELOs are essentially players that statistically align with the teams that performed well.
+This is why Gary Ablett appears here despite coming from a club that finished poorly that season.
+It is likely that the best teams had lots of uncontested posessions, contested posessions, and frees against, so those stats are overrepresented in the rating formula.
