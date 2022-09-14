@@ -23,12 +23,11 @@ player_stats_cols <-c(
 player_mean_data <- get_player_data(df, player_stats_cols, players)
 
 source("code/feature_gen.R")
-row_membership <- get_row_membership(df, players)
 home <- get_presence_matrix(df, games, players)
 away <- get_presence_matrix(df, games, players, is_away=1)
 player_matrix <- get_player_matrix(player_mean_data, player_stats_cols)
-stan_input <- get_stan_input(df, player_matrix, row_membership, home, away, games)
+stan_input <- get_stan_input(player_matrix, home, away, games)
 
 source("code/train_model.R")
-#model_fit <- train_model("code/model.stan", stan_input)
-#save(model_fit, file='model_v1.RData')
+model_fit <- train_model("code/model.stan", stan_input)
+save(model_fit, file='model_v1.RData')
