@@ -33,10 +33,12 @@ Let us see who the best players are.
 ```{r}
 player_scores <- player_matrix %*% beta + b0
 player_mean_data$score <- player_scores
+players <- players %>%
+  merge(player_mean_data[c("playerId", "score")])
 players %>%
-  merge(player_mean_data[c("playerId", "score")]) %>%
   arrange(desc(score)) %>%
   head(20)
+
 ```
 
 We can now try and apply this to the games in our dataset.
@@ -55,4 +57,13 @@ We can now try and apply this to compute win prediction accuracy.
 game_wins <- as.numeric(stan_input$deficit>0)
 predicted_wins <- as.numeric(predicted_deficits>0)
 print( sum(1-abs(game_wins-predicted_wins))/length(game_wins) )
+```
+
+We can show the scores by origin:
+```{r}
+players %>%
+  group_by(origin) %>%
+  summarise (avg_score = mean(score)) %>%
+  arrange(desc(avg_score)) %>%
+  head(10)
 ```
