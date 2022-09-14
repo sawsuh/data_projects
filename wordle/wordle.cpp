@@ -228,7 +228,11 @@ class Game {
   }
   void play() {
     Guess initial;
-    initial.guess = "soare";
+    if (self_play) {
+        initial.guess = "soare";
+    } else {
+        cin >> initial.guess;
+    }
     this->make_guess(initial);
     bool init = true;
     int old_asp_size, new_asp_size;
@@ -269,7 +273,7 @@ int main() {
   int sum = 0;
   int count = 0;
   Game blank(false);
-  //blank.play();
+  blank.play();
   bool starting = true;
   for(auto i: blank.answer_spce) {
     if (starting) {
