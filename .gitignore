@@ -9,3 +9,4 @@ wordle/.ipynb_checkpoints/*
 afl_model/**/*.RData
 afl_model/**/*.pdf
 **/.Rhistory
+**/*.png
