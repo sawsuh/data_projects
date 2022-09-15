@@ -26,7 +26,7 @@ res$beta[order(abs(res$beta), decreasing=T)]
 
 Let us see who the best players are.
 ```{r}
-player_mean_data$score <- res$player_value_raw
+player_mean_data$score <- res$player_value
 players <- merge(players, player_mean_data[,c('playerId', 'score')])
 players %>%
   arrange(desc(score)) %>%
