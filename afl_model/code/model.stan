@@ -25,7 +25,7 @@ transformed parameters {
 model {
     beta ~ double_exponential(0, 3);
     beta_intercept ~ double_exponential(0,3);
-    sigma_player ~ normal(0, 3);
+    sigma_player ~ normal(0, 0.5);
     sigma_deficit ~ normal(0, 50);
 
     player_value_raw ~ logistic(beta_intercept + player_data*beta, sigma_player);

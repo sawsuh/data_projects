@@ -11,59 +11,61 @@ library(ggplot2)
 
 First we will load the variables.
 ```{r}
-fit_summary <- summary(model_fit)$summary[, 'mean']
-print(fit_summary[1:10])
-b0 <- fit_summary['beta_intercept']
-beta <- fit_summary[startsWith(names(fit_summary), 'beta[')]
-names(beta) <- player_stats_cols
-print(beta)
-sigma_player <- fit_summary['sigma_player']
-game_intercept <- fit_summary['alpha']
-game_home <- fit_summary['beta_home']
-game_away <- fit_summary['beta_away']
-cat(c(game_home, game_away))
+cat(res$alpha)
+cat(res$beta_home)
+cat(res$beta_away)
+cat(res$sigma_deficit)
+cat(res$beta_intercept)
 ```
 
 We can see the most important statistics in order:
 ```{r}
-beta[order(beta, decreasing=T)]
+res$beta[order(res$beta, decreasing=T)]
+res$beta[order(abs(res$beta), decreasing=T)]
 ```
 
 Let us see who the best players are.
 ```{r}
-player_scores <- player_matrix %*% beta + b0
-player_mean_data$score <- player_scores
-players <- players %>%
-  merge(player_mean_data[c("playerId", "score")])
+player_mean_data$score <- res$player_value_raw
+players <- merge(players, player_mean_data[,c('playerId', 'score')])
 players %>%
   arrange(desc(score)) %>%
   head(20)
+```
 
+We can also show the top 5 players by position:
+```{r}
+players %>%
+  group_by(position) %>%
+  slice_max(order_by=score, n=5) %>%
+  select(c(displayName, position, score)) %>%
+  print(n=50)
 ```
 
 We can now try and apply this to the games in our dataset.
 ```{r}
-game_scores_home <- apply( home, 1, function(x) sum(x*player_scores)/sum(x) )
-game_scores_away <- apply( away, 1, function(x) sum(x*player_scores)/sum(x) )
-predicted_deficits <- game_intercept + game_home*game_scores_home - game_away*game_scores_away
-ggplot(data.frame(Residual=stan_input$deficit-predicted_deficits), aes(x=Residual)) +
-  geom_histogram(aes(y=stat(density)), colour=1, fill="white", binwidth=10) +
+ggplot(data.frame(Residual=stan_input$deficit-pred$deficits), aes(x=Residual)) +
+  geom_histogram(aes(y=stat(density)), colour=1, fill="white", bins=10) +
   geom_density() +
-  ggtitle("Residual Density Plot")
+  ggtitle("Residual Density Plot (Observed ELO)")
+ggplot(data.frame(Residual=stan_input$deficit-pred$deficits_expc), aes(x=Residual)) +
+  geom_histogram(aes(y=stat(density)), colour=1, fill="white", bins=10) +
+  geom_density() +
+  ggtitle("Residual Density Plot (Expected ELO)")
 ```
 
 We can now try and apply this to compute win prediction accuracy.
 ```{r}
 game_wins <- as.numeric(stan_input$deficit>0)
-predicted_wins <- as.numeric(predicted_deficits>0)
-print( sum(1-abs(game_wins-predicted_wins))/length(game_wins) )
+print( sum(game_wins==pred$wins)/length(game_wins) )
 ```
 
 We can show the scores by origin:
 ```{r}
 players %>%
   group_by(origin) %>%
-  summarise (avg_score = mean(score)) %>%
+  summarise (avg_score = mean(score), n_players=n()) %>%
   arrange(desc(avg_score)) %>%
-  head(10)
+  head(10) %>%
+  print
 ```

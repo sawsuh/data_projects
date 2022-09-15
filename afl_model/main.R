@@ -4,9 +4,9 @@ library(rstan)
 library(parallel)
 
 year_filter <- T
-year_to_use <- 2012:2021
-model_saved <- F
-model_path <- "model_v2.RData"
+year_to_use <- 2012
+model_saved <- T
+model_path <- "model_v1.RData"
 
 source("code/load_data.R")
 games <- get_file("data/games.csv", "game", filter_years=year_filter, years=year_to_use)
@@ -36,3 +36,8 @@ if (model_saved) {
   model_fit <- train_model("code/model.stan", stan_input)
   save(model_fit, file=model_path)
 }
+res <- get_stan_res(model_fit, player_stats_cols)
+pred <- predict_games_stan(res, home, away, player_matrix)
+sink(file="~/R_indic")
+print(1)
+sink(file=NULL)
