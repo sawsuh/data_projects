@@ -5,8 +5,8 @@ library(parallel)
 
 year_filter <- F
 year_to_use <- 2012:2021
-model_saved <- T
-model_path <- "model_v2.RData"
+model_saved <- F
+model_path <- "model_v3.RData"
 
 source("code/load_data.R")
 games <- get_file("data/games.csv", "game", filter_years=year_filter, years=year_to_use)

@@ -20,16 +20,23 @@ cat(res$beta_intercept)
 
 We can see the most important statistics in order:
 ```{r}
-res$beta[order(res$beta, decreasing=T)]
-res$beta[order(abs(res$beta), decreasing=T)]
+res$beta_a[order(res$beta_a, decreasing=T)]
+res$beta_a[order(abs(res$beta_a), decreasing=T)]
+res$beta_b[order(res$beta_b, decreasing=T)]
+res$beta_b[order(abs(res$beta_b), decreasing=T)]
 ```
 
-Let us see who the best players are.
+Let us see who the best players are (with at least 5 seasons in the data).
 ```{r}
-player_mean_data$score <- res$player_value_raw
-players <- merge(players, player_mean_data[,c('playerId', 'score')])
+player_mean_data$score_a <- res$player_value_raw_a
+player_mean_data$score_b <- res$player_value_raw_b
+players <- topn_players_stan(res, df, players, n=5) %>%
+  merge(player_mean_data[,c('playerId', 'score_a', 'score_b')])
 players %>%
-  arrange(desc(score)) %>%
+  arrange(desc(score_a)) %>%
+  head(20)
+players %>%
+  arrange(desc(score_b)) %>%
   head(20)
 ```
 
@@ -38,7 +45,12 @@ We can also show the top 5 players by position:
 players %>%
   group_by(position) %>%
   slice_max(order_by=score, n=5) %>%
-  select(c(displayName, position, score)) %>%
+  select(c(displayName, position, score_a)) %>%
+  print(n=50)
+players %>%
+  group_by(position) %>%
+  slice_max(order_by=score, n=5) %>%
+  select(c(displayName, position, score_b)) %>%
   print(n=50)
 ```
 
@@ -64,8 +76,16 @@ We can show the scores by origin:
 ```{r}
 players %>%
   group_by(origin) %>%
-  summarise (avg_score = mean(score), n_players=n()) %>%
-  arrange(desc(avg_score)) %>%
+  summarise (avg_score_a = mean(score_a), n_players=n()) %>%
+  arrange(desc(avg_score_a)) %>%
+  dplyr::filter(n_players >= 5) %>%
+  head(10) %>%
+  print
+players %>%
+  group_by(origin) %>%
+  summarise (avg_score_b = mean(score_b), n_players=n()) %>%
+  arrange(desc(avg_score_b)) %>%
+  dplyr::filter(n_players >= 5) %>%
   head(10) %>%
   print
 ```

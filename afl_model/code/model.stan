@@ -9,29 +9,36 @@ data {
 }
 parameters {
     real alpha;
-    real<lower=0> beta_home;
-    real<lower=0> beta_away;
+    real<lower=0> beta_home[2];
+    real<lower=0> beta_away[2];
     real<lower=0> sigma_deficit;
-    real<lower=0> sigma_player; // sd of X
-    real beta_intercept; // predict X for each player
-    vector[K] beta; // predict X for each player
-    vector[N_players] player_value_raw; // this is X
+    real<lower=0> sigma_player[2]; // sd of X
+    real beta_intercept[2]; // predict X for each player
+    vector[K] beta_a; // predict X for each player
+    vector[K] beta_b; // predict X for each player
+    vector[N_players] player_value_raw_a; // this is X
+    vector[N_players] player_value_raw_b; // this is X
 }
 transformed parameters {
 //    vector[N_players] player_value = append_row(player_value_raw, -sum(player_value_raw))/sd(append_row(player_value_raw, -sum(player_value_raw)));
 //
-    vector[N_players] player_value =(player_value_raw-mean(player_value_raw))/sd(player_value_raw);
+    vector[N_players] player_value_a =(player_value_raw_a-mean(player_value_raw_a))/sd(player_value_raw_a);
+    vector[N_players] player_value_b =(player_value_raw_b-mean(player_value_raw_b))/sd(player_value_raw_b);
 }
 model {
-    beta ~ double_exponential(0, 3);
-    beta_intercept ~ double_exponential(0,3);
-    sigma_player ~ normal(0, 0.5);
+    beta_a ~ double_exponential(0, 3);
+    beta_b ~ double_exponential(0, 3);
+    beta_intercept[1] ~ double_exponential(0,3);
+    beta_intercept[2] ~ double_exponential(0,3);
+    sigma_player[1] ~ normal(0, 0.5);
+    sigma_player[2] ~ normal(0, 0.5);
     sigma_deficit ~ normal(0, 50);
 
-    player_value_raw ~ logistic(beta_intercept + player_data*beta, sigma_player);
+    player_value_raw_a ~ logistic(beta_intercept[1] + player_data*beta_a, sigma_player[1]);
+    player_value_raw_b ~ logistic(beta_intercept[2] + player_data*beta_b, sigma_player[2]);
 
     for (n in 1:N_games) {
-        target += normal_lpdf(deficit[n] | alpha + beta_home*(dot_product(home[n],player_value)/sum(home[n])) - beta_away*(dot_product(away[n],player_value)/sum(away[n])), sigma_deficit);
+        target += normal_lpdf(deficit[n] | alpha + beta_home[1]*(dot_product(home[n],player_value_a)/sum(home[n])) + beta_home[2]*(dot_product(home[n],player_value_b)/sum(home[n])) - beta_away[1]*(dot_product(away[n],player_value_a)/sum(away[n])) - beta_away[2]*(dot_product(away[n],player_value_b)/sum(away[n])), sigma_deficit);
     }
 
 }
