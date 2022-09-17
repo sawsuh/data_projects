@@ -44,12 +44,12 @@ We can also show the top 5 players by position:
 ```{r}
 players %>%
   group_by(position) %>%
-  slice_max(order_by=score, n=5) %>%
+  slice_max(order_by=score_a, n=5) %>%
   select(c(displayName, position, score_a)) %>%
   print(n=50)
 players %>%
   group_by(position) %>%
-  slice_max(order_by=score, n=5) %>%
+  slice_max(order_by=score_b, n=5) %>%
   select(c(displayName, position, score_b)) %>%
   print(n=50)
 ```
