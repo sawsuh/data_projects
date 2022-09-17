@@ -26,12 +26,18 @@ res$beta_b[order(res$beta_b, decreasing=T)]
 res$beta_b[order(abs(res$beta_b), decreasing=T)]
 ```
 
-Let us see who the best players are (with at least 5 seasons in the data).
+Let us see who the best players are (with at least 100 games in the data).
 ```{r}
 player_mean_data$score_a <- res$player_value_raw_a
 player_mean_data$score_b <- res$player_value_raw_b
-players <- topn_players_stan(res, df, players, n=5) %>%
-  merge(player_mean_data[,c('playerId', 'score_a', 'score_b')])
+std_score_a <- scale(player_mean_data$score_a)
+std_score_b <- scale(player_mean_data$score_b)
+player_mean_data$score <- mean(c(res$beta_home[1], res$beta_away[1]))*std_score_a + mean(c(res$beta_home[2], res$beta_away[2]))*std_score_b
+players <- topn_players_stan(res, df, players, n=100) %>%
+  merge(player_mean_data[,c('playerId', 'score_a', 'score_b', 'score')])
+players %>%
+  arrange(desc(score)) %>%
+  head(20)
 players %>%
   arrange(desc(score_a)) %>%
   head(20)
@@ -42,6 +48,11 @@ players %>%
 
 We can also show the top 5 players by position:
 ```{r}
+players %>%
+  group_by(position) %>%
+  slice_max(order_by=score, n=5) %>%
+  select(c(displayName, position, score)) %>%
+  print(n=50)
 players %>%
   group_by(position) %>%
   slice_max(order_by=score_a, n=5) %>%
@@ -74,6 +85,13 @@ print( sum(game_wins==pred$wins)/length(game_wins) )
 
 We can show the scores by origin:
 ```{r}
+players %>%
+  group_by(origin) %>%
+  summarise (avg_score = mean(score), n_players=n()) %>%
+  arrange(desc(avg_score)) %>%
+  dplyr::filter(n_players >= 5) %>%
+  head(10) %>%
+  print
 players %>%
   group_by(origin) %>%
   summarise (avg_score_a = mean(score_a), n_players=n()) %>%

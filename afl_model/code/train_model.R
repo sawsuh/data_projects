@@ -52,10 +52,10 @@ predict_games_stan <- function(stan_res, home, away, player_mat) {
          wins=random_deficits>0
      )
 }
-topn_players_stan <- function(stan_res, main_df, players_df, n=5, idcol="playerId", yearcol="year") {
+topn_players_stan <- function(stan_res, main_df, players_df, n=5, idcol="playerId", gamecol="gameId") {
   players_with_n_seasons <- main_df %>%
     group_by(.data[[idcol]]) %>%
-    summarise(n_seasons = n_distinct(.data[[yearcol]])) %>%
+    summarise(n_seasons = n_distinct(.data[[gamecol]])) %>%
     dplyr::filter(n_seasons >= n)
   players_df[players_df[[idcol]] %in% players_with_n_seasons[[idcol]], ]
 }
