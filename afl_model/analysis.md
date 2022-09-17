@@ -361,7 +361,7 @@ game_wins <- as.numeric(stan_input$deficit>0)
 print( sum(game_wins==pred$wins)/length(game_wins) )
 ```
 
-    ## [1] 0
+    ## [1] 0.7257905
 
 We can show the scores by origin:
 
