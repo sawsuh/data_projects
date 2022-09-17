@@ -28,11 +28,11 @@ get_stan_res <- function(mf, player_cols) {
         player_value_a = index_startswith(fitsum, 'player_value_a'),
         player_value_b = index_startswith(fitsum, 'player_value_b'),
         player_value_raw_a = index_startswith(fitsum, 'player_value_raw_a'),
-        player_value_raw_b = index_startswith(fitsum, 'player_value_raw_b'),
+        player_value_raw_b = index_startswith(fitsum, 'player_value_raw_b')
     )
 }
 predict_games_stan <- function(stan_res, home, away, player_mat) {
-    random_deficits <- stan_res$alpha + stan_res$beta_home*(home%*%stan_res$player_value) - stan_res$beta_away*(away%*%stan_res$player_value)
+    #random_deficits <- stan_res$alpha + stan_res$beta_home*(home%*%stan_res$player_value) - stan_res$beta_away*(away%*%stan_res$player_value)
     random_deficits <- stan_res$alpha + 
       stan_res$beta_home_a*(home%*%stan_res$player_value_a) +
       stan_res$beta_home_b*(home%*%stan_res$player_value_b) - 
