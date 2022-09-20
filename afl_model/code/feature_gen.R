@@ -3,7 +3,7 @@
 
 get_presence_matrix <- function(main_df, games_df, players_df, is_away=F, game_idxcol="game_idx", 
                                 game_idcol="gameId", player_idxcol="player_idx", player_idcol="playerId", home_col="home") {
-  data <- main_df %>%
+  main_df %>%
     merge(games_df[, c(game_idxcol, game_idcol)], by=game_idcol) %>%
     merge(players_df[, c(player_idcol, player_idxcol)], by=player_idcol) %>%
     select(all_of(c(game_idxcol, player_idxcol, home_col))) %>%
