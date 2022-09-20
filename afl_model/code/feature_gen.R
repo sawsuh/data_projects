@@ -3,22 +3,20 @@
 
 get_presence_matrix <- function(main_df, games_df, players_df, is_away=F, game_idxcol="game_idx", 
                                 game_idcol="gameId", player_idxcol="player_idx", player_idcol="playerId", home_col="home") {
-  dat <- main_df %>%
+  data <- main_df %>%
     merge(games_df[, c(game_idxcol, game_idcol)], by=game_idcol) %>%
     merge(players_df[, c(player_idcol, player_idxcol)], by=player_idcol) %>%
-    select(c({{game_idxcol}}, {{player_idxcol}}, {{home_col}}))
-  if (is_away) {
-    dat[[home_col]] = 1-dat[[home_col]]
-  }
-  dat <- dat[order(dat[[player_idxcol]]), ]
-  dat <- pivot_wider(dat, names_from = {{player_idxcol}}, values_from = {{home_col}})
-  dat <- dat[order(dat[[game_idxcol]]), ] %>%
-    select(-{{game_idxcol}}) %>%
+    select(all_of(c(game_idxcol, player_idxcol, home_col))) %>%
+    when(
+      is_away ~ mutate({.}, "{home_col}" := 1-.data[[home_col]]),
+      ~ .
+    ) %>%
+    arrange(.data[[player_idxcol]]) %>%
+    pivot_wider(names_from = all_of(player_idxcol), values_from = all_of(home_col)) %>%
+    arrange(.data[[game_idxcol]]) %>%
+    select(-all_of(game_idxcol)) %>%
     replace(is.na(.), 0) %>%
     as.matrix
-  return(
-    dat
-  )
 }
 
 get_player_matrix <- function(player_mean_df, cols) {
