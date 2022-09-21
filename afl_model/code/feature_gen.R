@@ -32,8 +32,8 @@ calc_agg_presence <- function(presence_matrices) {
 
 # for each game
 # get cumavg of player stats up to that game
-get_game_avgs <- function(main, players_df, games_df, stats_cols, player_idxcol='player_idx', 
-                                 homecol='home', game_idxcol='game_idx', date_idxcol='date_idx', row_idxcol='row_idx')
+get_game_avgs <- function(main, players_df, games_df, stats_cols, presences, player_idxcol='player_idx',  
+                          homecol='home', game_idxcol='game_idx', date_idxcol='date_idx', row_idxcol='row_idx')
 {
   get_game_rolling_avg_helper <- function(homedf)
   {
@@ -54,9 +54,13 @@ get_game_avgs <- function(main, players_df, games_df, stats_cols, player_idxcol=
       arrange(.data[[game_idxcol]]) %>%
       select(all_of(stats_cols))
   }
+  agg_avgs_helper <- function(avgs) {
+    scale(avgs[['home']] - avgs[['away']])
+  }
   c(T,F) %>%
     set_names(c('home', 'away')) %>%
-    map(~ get_game_rolling_avg_helper(.))
+    map(~ get_game_rolling_avg_helper(.)) %>%
+    agg_avgs_helper
 }
 
 # scale above matrix and subtract away from home 

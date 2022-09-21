@@ -30,8 +30,7 @@ player_matrix <- get_player_matrix(player_mean_data, player_stats_cols)
 
 presence <- get_presence_matrices(df, games, players)
 agg_presence <- calc_agg_presence(presence)
-game_avgs <- get_game_avgs(df, players, games, player_stats_cols)
-scaled_avgs <- scale_stats(game_avgs, presence)
+game_avgs <- get_game_avgs(df, players, games, player_stats_cols, presence)
 
 stan_input <- get_stan_input(player_matrix, presence, games)
 
