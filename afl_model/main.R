@@ -21,15 +21,17 @@ player_stats_cols <-c(
   "Uncontested.Possessions", "Contested.Marks", "Marks.Inside.50", 
   "One.Percenters", "Bounces", "Goal.Assists"
 )
+# don't need
 player_mean_data <- get_player_data(df, player_stats_cols, players)
 
 source("code/feature_gen.R")
+# don't need
 player_matrix <- get_player_matrix(player_mean_data, player_stats_cols)
 
-game_avgs <- get_game_avgs(df, players, games, player_stats_cols)
-avgs_mean_sd <- get_stats(game_avgs)
-scaled_avgs <- scale_stats(game_avgs, avgs_mean_sd, nrow(games))
 presence <- get_presence_matrices(df, games, players)
+agg_presence <- calc_agg_presence(presence)
+game_avgs <- get_game_avgs(df, players, games, player_stats_cols)
+scaled_avgs <- scale_stats(game_avgs, presence)
 
 stan_input <- get_stan_input(player_matrix, presence, games)
 

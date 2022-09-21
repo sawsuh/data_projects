@@ -1,6 +1,6 @@
 ### create features for stan
 
-
+# 1s where player appears in home/away
 get_presence_matrices <- function(main_df, games_df, players_df, game_idxcol="game_idx", 
                                 game_idcol="gameId", player_idxcol="player_idx", player_idcol="playerId", home_col="home") {
   presence_helper <- function(away_flag) {
@@ -22,6 +22,12 @@ get_presence_matrices <- function(main_df, games_df, players_df, game_idxcol="ga
   c(F,T) %>%
     set_names(c('home', 'away')) %>%
     map( ~presence_helper(.))
+}
+
+# scale presence matrix and subtract away from home
+calc_agg_presence <- function(presence_matrices) {
+  2*(presence_matrices[['home']] - presence_matrices[['away']])/
+    apply(presence_matrices[['home']]+presence_matrices[['away']], 1, sum)
 }
 
 # for each game
@@ -52,20 +58,10 @@ get_game_avgs <- function(main, players_df, games_df, stats_cols, player_idxcol=
     set_names(c('home', 'away')) %>%
     map(~ get_game_rolling_avg_helper(.))
 }
-get_stats  <- function(avgs) {
-  c(mean, sd) %>%
-    set_names('mean', 'sd') %>%
-    map(~ apply(do.call(rbind, avgs), 2, .))
-}
-scale_stats <- function(avgs, avg_stats_vec, N) {
-  avg_stats_mat <- map(
-    avg_stats_vec,
-    ~ t(replicate(N, .))
-  )
-  map(
-    avgs,
-    ~ (.-avg_stats_mat[['mean']])/avg_stats_mat[['sd']]
-  )
+
+# scale above matrix and subtract away from home 
+scale_stats <- function(avgs, presence) {
+  scale(avgs[['home']]/apply(presence[['home']], 1, sum) - avgs[['away']]/apply(presence[['away']],1,sum))
 }
 
 get_player_matrix <- function(player_mean_df, cols) {
