@@ -9,7 +9,7 @@ model_saved <- T
 model_path <- "model_v3.RData"
 
 source("code/load_data.R")
-games <- get_file("data/games.csv", "game", filter_years=year_filter, years=year_to_use)
+games <- get_file("data/games.csv", "game", filter_years=year_filter, years=year_to_use, get_date=T)
 players <- get_file("data/players.csv", "player")
 stats <- get_file("data/stats.csv", "row", filter_years=year_filter, years=year_to_use)
 df <- get_main_df(stats, games)
@@ -24,10 +24,16 @@ player_stats_cols <-c(
 player_mean_data <- get_player_data(df, player_stats_cols, players)
 
 source("code/feature_gen.R")
-home <- get_presence_matrix(df, games, players)
-away <- get_presence_matrix(df, games, players, is_away=T)
 player_matrix <- get_player_matrix(player_mean_data, player_stats_cols)
-stan_input <- get_stan_input(player_matrix, home, away, games)
+
+game_avgs <- get_game_avgs(df, players, games, player_stats_cols)
+scaled_avgs <- scale_stats(game_avgs, nrow(games))
+presence <- map(
+  c(F,T),
+  ~get_presence_matrix(df, games, players, is_away=.)
+)
+
+stan_input <- get_stan_input(player_matrix, presence, games)
 
 source("code/train_model.R")
 if (model_saved) {
@@ -37,7 +43,7 @@ if (model_saved) {
   save(model_fit, file=model_path)
 }
 res <- get_stan_res(model_fit, player_stats_cols)
-pred <- predict_games_stan(res, home, away, player_matrix)
+pred <- predict_games_stan(res, presence, player_matrix)
 sink(file="~/R_indic")
 print(1)
 sink(file=NULL)

@@ -1,12 +1,23 @@
 ### Data building functions
 
-get_file <- function(filepath, name, filter_years=F, years=2012:2021, yearcol='year') {
+get_file <- function(filepath, name, filter_years=F, years=2012:2021, yearcol='year', get_date=F, datecol='date') {
+  sort_year_helper <- function(dat) {
+    dat %>%
+      mutate('{datecol}' := parse_date(.data[[datecol]], "%d-%b-%Y")) %>%
+      arrange(.data[[paste0(datecol)]]) %>%
+      mutate('{datecol}_idx' := row_number()) %>%
+      arrange(.data[[paste0(name,'_idx')]])
+  }
   read.csv(filepath) %>%
     when(
       filter_years ~ .[.[[yearcol]] %in% years, ],
       ~ .
     ) %>%
-    mutate("{name}_idx" := row_number()) 
+    mutate("{name}_idx" := row_number())  %>%
+    when(
+      get_date ~ sort_year_helper(.),
+      ~ .
+    ) 
 }
 
 get_main_df <- function(stats_df, games_df, homecol="homeTeam", awaycol="awayTeam", homescore="homeTeamScore", awayscore="awayTeamScore", 
