@@ -34,16 +34,16 @@ get_stan_res <- function(mf, player_cols) {
 predict_games_stan <- function(stan_res, presence_dfs, player_mat) {
     #random_deficits <- stan_res$alpha + stan_res$beta_home*(home%*%stan_res$player_value) - stan_res$beta_away*(away%*%stan_res$player_value)
     random_deficits <- stan_res$alpha + 
-      stan_res$beta_home[1]*(presence_dfs[[1]]%*%stan_res$player_value_a) +
-      stan_res$beta_home[2]*(presence_dfs[[1]]%*%stan_res$player_value_b) - 
-      stan_res$beta_away[1]*(presence_dfs[[2]]%*%stan_res$player_value_a) -
-      stan_res$beta_away[2]*(presence_dfs[[2]]%*%stan_res$player_value_b)
+      stan_res$beta_home[1]*(presence_dfs[['home']]%*%stan_res$player_value_a) +
+      stan_res$beta_home[2]*(presence_dfs[['home']]%*%stan_res$player_value_b) - 
+      stan_res$beta_away[1]*(presence_dfs[['away']]%*%stan_res$player_value_a) -
+      stan_res$beta_away[2]*(presence_dfs[['away']]%*%stan_res$player_value_b)
     player_scores_a <- stan_res$beta_intercept[1] + player_mat %*% stan_res$beta_a
     player_scores_b <- stan_res$beta_intercept[2] + player_mat %*% stan_res$beta_b
-    scores_home_a <- apply(presence_dfs[[1]], 1, function(x) sum(x*player_scores_a)/sum(x))
-    scores_away_a <- apply(presence_dfs[[2]], 1, function(x) sum(x*player_scores_a)/sum(x))
-    scores_home_b <- apply(presence_dfs[[1]], 1, function(x) sum(x*player_scores_b)/sum(x))
-    scores_away_b <- apply(presence_dfs[[2]], 1, function(x) sum(x*player_scores_b)/sum(x))
+    scores_home_a <- apply(presence_dfs[['home']], 1, function(x) sum(x*player_scores_a)/sum(x))
+    scores_away_a <- apply(presence_dfs[['away']], 1, function(x) sum(x*player_scores_a)/sum(x))
+    scores_home_b <- apply(presence_dfs[['home']], 1, function(x) sum(x*player_scores_b)/sum(x))
+    scores_away_b <- apply(presence_dfs[['away']], 1, function(x) sum(x*player_scores_b)/sum(x))
     expected_deficits <- stan_res$alpha + stan_res$beta_home[1]*scores_home_a + stan_res$beta_home[2]*scores_home_b - 
       stan_res$beta_away[1]*scores_away_a - stan_res$beta_away[2]*scores_away_b
     list(

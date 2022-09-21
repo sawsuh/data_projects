@@ -1,22 +1,27 @@
 ### create features for stan
 
 
-get_presence_matrix <- function(main_df, games_df, players_df, is_away=F, game_idxcol="game_idx", 
+get_presence_matrices <- function(main_df, games_df, players_df, game_idxcol="game_idx", 
                                 game_idcol="gameId", player_idxcol="player_idx", player_idcol="playerId", home_col="home") {
-  main_df %>%
-    merge(games_df[, c(game_idxcol, game_idcol)], by=game_idcol) %>%
-    merge(players_df[, c(player_idcol, player_idxcol)], by=player_idcol) %>%
-    select(all_of(c(game_idxcol, player_idxcol, home_col))) %>%
-    when(
-      is_away ~ mutate({.}, "{home_col}" := 1-.data[[home_col]]),
-      ~ .
-    ) %>%
-    arrange(.data[[player_idxcol]]) %>%
-    pivot_wider(names_from = all_of(player_idxcol), values_from = all_of(home_col)) %>%
-    arrange(.data[[game_idxcol]]) %>%
-    select(-all_of(game_idxcol)) %>%
-    replace(is.na(.), 0) %>%
-    as.matrix
+  presence_helper <- function(away_flag) {
+    main_df %>%
+      merge(games_df[, c(game_idxcol, game_idcol)], by=game_idcol) %>%
+      merge(players_df[, c(player_idcol, player_idxcol)], by=player_idcol) %>%
+      select(all_of(c(game_idxcol, player_idxcol, home_col))) %>%
+      when(
+        away_flag ~ mutate({.}, "{home_col}" := 1-.data[[home_col]]),
+        ~ .
+      ) %>%
+      arrange(.data[[player_idxcol]]) %>%
+      pivot_wider(names_from = all_of(player_idxcol), values_from = all_of(home_col)) %>%
+      arrange(.data[[game_idxcol]]) %>%
+      select(-all_of(game_idxcol)) %>%
+      replace(is.na(.), 0) %>%
+      as.matrix
+  }
+  c(F,T) %>%
+    set_names(c('home', 'away')) %>%
+    map( ~presence_helper(.))
 }
 
 # for each game
@@ -43,16 +48,14 @@ get_game_avgs <- function(main, players_df, games_df, stats_cols, player_idxcol=
       arrange(.data[[game_idxcol]]) %>%
       select(all_of(stats_cols))
   }
-  map(
-    c(T,F),
-    ~ get_game_rolling_avg_helper(.)
-  )
+  c(T,F) %>%
+    set_names(c('home', 'away')) %>%
+    map(~ get_game_rolling_avg_helper(.))
 }
 scale_stats <- function(avgs, N) {
-  ov_stats <- map(
-    c(mean, sd),
-    ~ t(replicate(N,apply(do.call(rbind, avgs), 2, .)))
-  )
+  ov_stats <- c(mean, sd) %>%
+    set_names('mean', 'sd') %>%
+    map(~ t(replicate(N,apply(do.call(rbind, avgs), 2, .))))
   map(
     avgs,
     ~ (.-ov_stats[[1]])/ov_stats[[2]]
@@ -72,8 +75,8 @@ get_stan_input <- function(player_mean_matrix, presence_dfs, game_df, row_member
     N_players = nrow(player_mean_matrix),
     N_games = nrow(game_df),
     player_data = player_mean_matrix,
-    home = presence_dfs[[1]],
-    away = presence_dfs[[2]],
+    home = presence_dfs[['home']],
+    away = presence_dfs[['away']],
     deficit = game_df[[homescore]] - game_df[[awayscore]]
   )
 }
