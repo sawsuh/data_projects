@@ -52,13 +52,19 @@ get_game_avgs <- function(main, players_df, games_df, stats_cols, player_idxcol=
     set_names(c('home', 'away')) %>%
     map(~ get_game_rolling_avg_helper(.))
 }
-scale_stats <- function(avgs, N) {
-  ov_stats <- c(mean, sd) %>%
+get_stats  <- function(avgs) {
+  c(mean, sd) %>%
     set_names('mean', 'sd') %>%
-    map(~ t(replicate(N,apply(do.call(rbind, avgs), 2, .))))
+    map(~ apply(do.call(rbind, avgs), 2, .))
+}
+scale_stats <- function(avgs, avg_stats_vec, N) {
+  avg_stats_mat <- map(
+    avg_stats_vec,
+    ~ t(replicate(N, .))
+  )
   map(
     avgs,
-    ~ (.-ov_stats[[1]])/ov_stats[[2]]
+    ~ (.-avg_stats_mat[['mean']])/avg_stats_mat[['sd']]
   )
 }
 
