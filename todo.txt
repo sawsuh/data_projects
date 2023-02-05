@@ -1,5 +1,6 @@
 - have beta_home = beta_away
 - simplify to alpha + beta((home - away avgs up to that game)*theta)
+
 - expand theta to 2 dimensions and do variable selection
+
 - write scraper
-- integrate old models into functions in current model

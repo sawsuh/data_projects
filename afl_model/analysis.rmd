@@ -11,11 +11,11 @@ library(ggplot2)
 
 First we will load the variables.
 ```{r}
-cat(res$alpha)
-cat(res$beta_home)
-cat(res$beta_away)
-cat(res$sigma_deficit)
-cat(res$beta_intercept)
+vars_1dim <- c( 'alpha', 'beta_home', 'beta_away', 'sigma_deficit', 'beta_intercept')
+walk(
+  vars_1dim,
+  ~  cat(., ' = ', res[[.]], '\n')
+)
 ```
 
 We can see the most important statistics in order:
@@ -35,46 +35,51 @@ std_score_b <- scale(player_mean_data$score_b)
 player_mean_data$score <- mean(c(res$beta_home[1], res$beta_away[1]))*std_score_a + mean(c(res$beta_home[2], res$beta_away[2]))*std_score_b
 players <- topn_players_stan(res, df, players, n=100) %>%
   merge(player_mean_data[,c('playerId', 'score_a', 'score_b', 'score')])
-players %>%
-  arrange(desc(score)) %>%
-  head(20)
-players %>%
-  arrange(desc(score_a)) %>%
-  head(20)
-players %>%
-  arrange(desc(score_b)) %>%
-  head(20)
+scorecols <-  c('score', 'score_a', 'score_b')
+walk(
+  scorecols,
+  function(sc) {
+    cat('\n ', rep('=', 30), '\n score: ', sc, '\n')
+    players %>%
+      arrange(desc(.data[[sc]])) %>%
+      head(20) %>%
+      select(all_of(c('displayName', 'position', sc))) %>%
+      print
+  }
+)
 ```
 
 We can also show the top 5 players by position:
 ```{r}
-players %>%
-  group_by(position) %>%
-  slice_max(order_by=score, n=5) %>%
-  select(c(displayName, position, score)) %>%
-  print(n=50)
-players %>%
-  group_by(position) %>%
-  slice_max(order_by=score_a, n=5) %>%
-  select(c(displayName, position, score_a)) %>%
-  print(n=50)
-players %>%
-  group_by(position) %>%
-  slice_max(order_by=score_b, n=5) %>%
-  select(c(displayName, position, score_b)) %>%
-  print(n=50)
+walk(
+  scorecols,
+  function(scorecol) {
+    cat('\n ', rep('=', 30), '\n score: ', scorecol, '\n')
+    players %>%
+      group_by(position) %>%
+      slice_max(order_by=.data[[scorecol]], n=5) %>%
+      group_walk(~ {
+        cat(paste0('\n', 'score: ', scorecol, ', position: ', .y, '\n'))
+        print(.x[, c('displayName', scorecol)])
+        cat('\n')
+      })
+  }
+)
 ```
 
 We can now try and apply this to the games in our dataset.
 ```{r}
-ggplot(data.frame(Residual=stan_input$deficit-pred$deficits), aes(x=Residual)) +
-  geom_histogram(aes(y=stat(density)), colour=1, fill="white", bins=10) +
-  geom_density() +
-  ggtitle("Residual Density Plot (Observed ELO)")
-ggplot(data.frame(Residual=stan_input$deficit-pred$deficits_expc), aes(x=Residual)) +
-  geom_histogram(aes(y=stat(density)), colour=1, fill="white", bins=10) +
-  geom_density() +
-  ggtitle("Residual Density Plot (Expected ELO)")
+walk2(
+  c('deficits', 'deficits_expc'),
+  c("Residual Density Plot (Expected ELO)","Residual Density Plot (Observed ELO)"),
+  ~ {
+    (ggplot(data.frame(Residual=stan_input$deficit-pred[[.x]]), aes(x=Residual)) +
+      geom_histogram(aes(y=stat(density)), colour=1, fill="white", bins=10) +
+      geom_density() +
+      ggtitle(.y)) %>%
+      print
+  }
+)
 ```
 
 We can now try and apply this to compute win prediction accuracy.
@@ -85,25 +90,17 @@ print( sum(game_wins==pred$wins)/length(game_wins) )
 
 We can show the scores by origin:
 ```{r}
-players %>%
-  group_by(origin) %>%
-  summarise (avg_score = mean(score), n_players=n()) %>%
-  arrange(desc(avg_score)) %>%
-  dplyr::filter(n_players >= 5) %>%
-  head(10) %>%
-  print
-players %>%
-  group_by(origin) %>%
-  summarise (avg_score_a = mean(score_a), n_players=n()) %>%
-  arrange(desc(avg_score_a)) %>%
-  dplyr::filter(n_players >= 5) %>%
-  head(10) %>%
-  print
-players %>%
-  group_by(origin) %>%
-  summarise (avg_score_b = mean(score_b), n_players=n()) %>%
-  arrange(desc(avg_score_b)) %>%
-  dplyr::filter(n_players >= 5) %>%
-  head(10) %>%
-  print
+walk(
+  scorecols,
+  function(sc) {
+    cat('\n score: ', sc, '\n')
+    players %>%
+      group_by(origin) %>%
+      summarise (avg_score = mean(.data[[sc]]), n_players=n()) %>%
+      arrange(desc(avg_score)) %>%
+      dplyr::filter(n_players >= 5) %>%
+      head(10) %>%
+      print
+  }
+)
 ```
