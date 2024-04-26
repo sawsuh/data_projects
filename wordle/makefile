@@ -1,2 +1,2 @@
-make: wordle
-	g++ wordle.cpp -o wordle
+make: 
+	clang++ -fopenmp -O3 -Wall wordle.cpp -o wordle
