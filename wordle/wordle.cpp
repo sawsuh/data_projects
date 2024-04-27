@@ -232,7 +232,7 @@ public:
   void play() {
     Guess initial;
     if (self_play) {
-      initial.guess = "soare";
+      initial.guess = "crane";
     } else {
       cin >> initial.guess;
     }
@@ -275,7 +275,7 @@ int main() {
   int sum = 0;
   int count = 0;
   Game blank(false);
-  // blank.play();
+  blank.play();
   bool starting = true;
   for (auto i : blank.answer_spce) {
     if (starting) {
